@@ -1,5 +1,7 @@
 # KeyForge
 
+English | [简体中文](./README.zh-CN.md)
+
 A **LessPass v2-compatible** deterministic password generator with local profile memory, custom symbol subsets, counter tracking, and AES-256-CTR encrypted sync.
 
 > Inspired by [LessPass](https://github.com/lesspass/lesspass). KeyForge keeps the stateless, master-password-free architecture while adding everyday usability enhancements for personal multi-device workflows.
@@ -27,14 +29,34 @@ A **LessPass v2-compatible** deterministic password generator with local profile
 
 ---
 
-## Three Build Targets (One Codebase)
+## Deployment & Installation
 
-1. **Browser Extension (Manifest V3)** — `dist/extension/`
-   - Open `chrome://extensions/` (or `edge://extensions/`), enable **Developer mode**, and click **Load unpacked** -> select `dist/extension`.
-2. **Offline PWA** — `dist/pwa/`
-   - Deployed automatically via GitHub Actions to GitHub Pages. Open on Android Chrome/Edge and tap **Add to Home screen** to use completely offline.
-3. **Standalone Single-File HTML** — `dist/mylesspass-standalone.html`
-   - Open directly in any desktop browser without installation.
+### 1. Browser Extension (Chrome / Edge, Manifest V3)
+
+Since `dist/` is generated locally during build, build the extension package first:
+
+```bash
+git clone https://github.com/aDobeZ/KeyForge.git
+cd KeyForge
+npm install
+npm run build
+```
+
+Then load it into your browser:
+1. Open `chrome://extensions/` in Chrome (or `edge://extensions/` in Edge).
+2. Enable **Developer mode** in the top-right corner.
+3. Click **Load unpacked** and select the `dist/extension` folder inside this project.
+4. Click the **KeyForge** icon in the toolbar (you can pin the icon to the toolbar for quick access). It automatically reads the current tab's domain and matches saved profiles.
+
+### 2. Offline PWA (Android / Mobile)
+
+This repository includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) that automatically builds and deploys `dist/pwa/` to GitHub Pages on every push to `main`:
+1. In your GitHub repository, go to **Settings -> Pages -> Build and deployment -> Source** and select **GitHub Actions**.
+2. Open the deployed Pages URL in mobile Chrome/Edge and tap **Add to Home screen** to use completely offline.
+
+### 3. Standalone Single-File HTML (Desktop)
+
+After running `npm run build`, you can directly double-click `dist/mylesspass-standalone.html` to use KeyForge in any browser without installation.
 
 ---
 
