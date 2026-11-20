@@ -1,0 +1,17 @@
+{
+  "name": "KeyForge",
+  "short_name": "KeyForge",
+  "description": "增强版离线无状态密码生成器与平台档案管理器",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
