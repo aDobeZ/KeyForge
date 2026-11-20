@@ -3,9 +3,12 @@
   "name": "KeyForge",
   "version": "1.0.0",
   "description": "增强版 LessPass 密码生成器：支持平台记忆、重随机次数、自定义特殊符号及加密备份。",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "sidePanel"],
   "action": {
     "default_popup": "index.html",
     "default_title": "KeyForge"
+  },
+  "side_panel": {
+    "default_path": "index.html?mode=sidepanel"
   }
 }

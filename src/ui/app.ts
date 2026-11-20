@@ -20,7 +20,12 @@ import {
   encryptProfilesToBase64,
   encryptProfilesToBytes,
 } from '../core/crypto-sync';
-import { getActiveTabDomain, isExtensionEnvironment } from '../core/extension-bridge';
+import {
+  getActiveTabDomain,
+  isExtensionEnvironment,
+  isSidePanelContext,
+  pinToSidePanel,
+} from '../core/extension-bridge';
 
 type TabKey = 'generate' | 'profiles' | 'sync';
 
@@ -62,6 +67,7 @@ interface AppState {
   // UI feedback
   toastMessage: string;
   isExt: boolean;
+  isSidePanel: boolean;
 }
 
 const state: AppState = {
@@ -94,6 +100,7 @@ const state: AppState = {
   decryptPreview: null,
   toastMessage: '',
   isExt: isExtensionEnvironment(),
+  isSidePanel: isSidePanelContext(),
 };
 
 let toastTimer: number | undefined;
@@ -469,8 +476,15 @@ function render() {
       <div class="header">
         <div class="brand">
           <span>🔐 KeyForge</span>
-          <span class="brand-badge">${state.isExt ? '插件版' : 'Web / PWA'}</span>
+          <span class="brand-badge">${state.isExt ? (state.isSidePanel ? '侧边栏' : '插件版') : 'Web / PWA'}</span>
         </div>
+        ${
+          state.isExt
+            ? state.isSidePanel
+              ? `<button type="button" class="btn btn-sm" id="btn-sync-tab-domain" title="读取当前激活网页的域名">🔄 读取当前网页</button>`
+              : `<button type="button" class="btn btn-sm" id="btn-pin-sidepanel" title="固定在浏览器右侧边栏，点击网页不关闭">📌 固定侧边栏</button>`
+            : ''
+        }
       </div>
 
       <div class="tabs">
@@ -494,6 +508,39 @@ function render() {
 }
 
 function bindEvents() {
+  const btnPinSidePanel = document.getElementById('btn-pin-sidepanel');
+  if (btnPinSidePanel) {
+    btnPinSidePanel.onclick = async () => {
+      const ok = await pinToSidePanel();
+      if (!ok) showToast('当前浏览器不支持侧边栏固定');
+    };
+  }
+
+  const btnSyncDomain = document.getElementById('btn-sync-tab-domain');
+  if (btnSyncDomain) {
+    btnSyncDomain.onclick = async () => {
+      const domain = await getActiveTabDomain();
+      if (!domain) {
+        showToast('当前标签页没有可识别的网页域名');
+        return;
+      }
+      state.site = domain;
+      const matched = state.profiles.find(
+        (p) => p.site.toLowerCase() === domain.toLowerCase()
+      );
+      if (matched) {
+        applyProfileToForm(matched);
+        if (state.masterPassword) await computePassword(false);
+        showToast(`已匹配 ${domain}`);
+      } else {
+        state.editingId = null;
+        showToast(`已读取域名: ${domain}`);
+      }
+      state.activeTab = 'generate';
+      render();
+    };
+  }
+
   // Tab switching
   document.querySelectorAll<HTMLElement>('[data-tab]').forEach((el) => {
     el.onclick = () => {
